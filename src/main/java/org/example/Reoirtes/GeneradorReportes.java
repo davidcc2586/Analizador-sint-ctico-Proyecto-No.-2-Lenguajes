@@ -1,8 +1,10 @@
 package org.example.Reoirtes;
 
+import org.example.AST.NodoPrograma;
 import org.example.Datos.ErrorCompilacion;
 import org.example.Datos.TipoToken;
 import org.example.Datos.Token;
+import org.example.Semantico.Simbolo;
 
 import java.io.*;
 import java.util.List;
@@ -280,7 +282,38 @@ public class GeneradorReportes {
         finPagina(html, rutaSalida);
     }
 
+    // Reporte de la tabla de símbolos: agentes y variables con tipo, ámbito y línea.
+    public void generarReporteTablaSimbolosHTML(List<Simbolo> simbolos, String rutaSalida) {
+        StringBuilder html = inicioPagina("Tabla de Símbolos - PromptZal", "Tabla de Símbolos", "#166534", "#f0fdf4", "#166534");
+        if (simbolos.isEmpty()) {
+            html.append("  <div class=\"ok\">No se registraron símbolos (no hay agentes ni variables).</div>\n");
+        } else {
+            html.append("  <table>\n<thead><tr><th>#</th><th>Identificador</th><th>Tipo</th><th>Ámbito</th><th>Línea</th></tr></thead>\n<tbody>\n");
+            int i = 1;
+            for (Simbolo simbolo : simbolos) {
+                html.append("<tr>")
+                        .append("<td>").append(i++).append("</td>")
+                        .append("<td><span class=\"code\">").append(escapeHtml(simbolo.getNombre())).append("</span></td>")
+                        .append("<td>").append(simbolo.getTipo()).append("</td>")
+                        .append("<td>").append(escapeHtml(simbolo.getAmbito())).append("</td>")
+                        .append("<td>").append(simbolo.getLinea()).append("</td>")
+                        .append("</tr>\n");
+            }
+            html.append("</tbody>\n  </table>\n");
+        }
+        finPagina(html, rutaSalida);
+    }
 
+    //árbol en texto con sangrías.
+    public void generarReporteASTHTML(NodoPrograma nodoPrograma, String rutaSalida) {
+        StringBuilder html = inicioPagina("Reporte del AST - PromptZal", " Árbol de Sintaxis Abstracta (AST)", "#1e40af", "#eff6ff", "#1e40af");
+        if (nodoPrograma == null) {
+            html.append("  <div class=\"ok\">No hay AST: primero debe compilar un programa.</div>\n");
+        } else {
+            html.append("  <pre class=\"arbol\">").append(escapeHtml(nodoPrograma.toStringArbol(""))).append("</pre>\n");
+        }
+        finPagina(html, rutaSalida);
+    }
 
     private StringBuilder inicioPagina(String titulo, String h1, String colorTitulo, String fondoTh, String colorTh) {
         StringBuilder html = new StringBuilder();
